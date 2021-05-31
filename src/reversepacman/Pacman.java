@@ -92,24 +92,12 @@ public class Pacman extends Character {
 		//  Return Move berdasarkan jalur yang menuju cherry
 	}
 
-	private Move searchPoint(int[][] tile, Ghost ghost) {
-		
-		boolean adjEmpty = false;
+	private Move searchPoint(int[][] tile, Ghost ghost) {	
 		Position pos = this.getPosition();
 		Position ghostPos = ghost.getPosition();
-		int adjTiles[] = getAdjacentTiles(pos.x(), pos.y(), tile);
+		boolean adjEmpty = isAdjEmpty(pos, ghostPos, tile);
 		
-		if (adjTiles[0] != 0 && adjTiles[1] != 0 && adjTiles[2] != 0 && adjTiles[3] != 0) {
-			adjEmpty = true;
-		} 
-		
-		System.out.printf("adjEmpty: %b\n", adjEmpty);
-		for (int adj : adjTiles) {
-			System.out.printf("%d ", adj);
-		}
-		System.out.printf("\n");
 		System.out.printf("start: %d %d\n", pos.x(), pos.y());
-		
 		
 		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
 		Tree searchTree = new Tree(node);
@@ -120,7 +108,7 @@ public class Pacman extends Character {
 			node = fringe.pop();
 			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
 			
-			if ((adjEmpty && tile[node.data.x()][node.data.y()] == 1) || 
+			if ((adjEmpty && tile[node.data.x()][node.data.y()] == 0) || 
 					(!adjEmpty && node.cost == 15)) {
 				return getMove(getNextMoveNode(node, searchTree));
 			}
@@ -134,7 +122,8 @@ public class Pacman extends Character {
 				TreeNode child = new TreeNode(childPos, node.cost + 1, 
 						getHeuristic(childPos, ghostPos));
 				
-				if (!adjEmpty && tile[childPos.x()][childPos.y()] != 0) {
+				if (!adjEmpty && (tile[childPos.x()][childPos.y()] == 1 ||
+						tile[childPos.x()][childPos.y()] == -1)) {
 					continue;
 				}
 				
@@ -146,6 +135,25 @@ public class Pacman extends Character {
 			System.out.printf("fringe size: %d\n", fringe.size());
 		}
 		return getMove(getNextMoveNode(node, searchTree));
+	}
+	
+	private boolean isAdjEmpty(Position pos, Position ghostPos, int tile[][]) {
+		int adj[] = getAdjacentTiles(pos.x(), pos.y(), tile);
+		
+		boolean up = (adj[0] != 0 || 
+				getHeuristic(new Position(pos.x()-1, pos.y()), ghostPos) <= 2) ? true : false;
+		
+		boolean right = (adj[1] != 0 || 
+				getHeuristic(new Position(pos.x(), pos.y()+1), ghostPos) <= 2) ? true : false;
+		
+		boolean down = (adj[2] != 0 || 
+				getHeuristic(new Position(pos.x()+1, pos.y()), ghostPos) <= 2) ? true : false;
+		
+		boolean left = (adj[3] != 0 || 
+				getHeuristic(new Position(pos.x(), pos.y()-1), ghostPos) <= 2) ? true : false;
+		
+		if (up && right && down && left) return true;
+		return false;
 	}
 	
 	private Move getMove(TreeNode node) {
