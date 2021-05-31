@@ -1,6 +1,6 @@
 package reversepacman;
 
-public abstract class Character extends Sprite {
+public abstract class Character extends Tile {
     protected boolean moving;
     protected int dx, dy;
     protected int moveCount;
@@ -14,9 +14,24 @@ public abstract class Character extends Sprite {
         this.frames = 4;
         this.moveCount = 0;
 
-        initCharacter();
+        initTile();
     }
-
-    protected abstract void initCharacter(); 
-    public abstract void move();
+    
+    protected void initTile(){    
+    	initCharacter();
+    }
+    
+	public void move() {
+		if (moving) {
+			x += dx;
+			y += dy;
+			moveCount++;
+		}
+		
+		if (moveCount == frames) {
+			moving = false;
+		}
+	}
+	
+    protected abstract void initCharacter();
 }

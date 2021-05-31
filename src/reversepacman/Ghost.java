@@ -1,10 +1,11 @@
 package reversepacman;
 
+import java.awt.event.KeyEvent;
+
 public class Ghost extends Character {
 	
 	public Ghost(int x, int y) {
 		super(x, y);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -12,11 +13,36 @@ public class Ghost extends Character {
 		loadImage("src/resources/ghost.png");
         getImageDimensions();		
 	}
-
-	@Override
-	public void move() {
-		// TODO Auto-generated method stub
+	
+	public void keyPressed(KeyEvent e, int[][] tile) {
 		
+		if(!moving) {
+			Position pos = getPosition();
+			int key = e.getKeyCode();
+			
+			if (key == KeyEvent.VK_UP || key == KeyEvent.VK_W) {
+				dx = 0;
+				dy = (tile[pos.x()-1][pos.y()] != 1) ? (int)(-1 * Level.TILESIZE / frames) : 0;
+			}
+			
+			else if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) {
+				dx = (tile[pos.x()][pos.y()+1] != 1) ? (int)(1 * Level.TILESIZE / frames) : 0;
+				dy = 0;
+			}
+			
+			else if (key == KeyEvent.VK_DOWN  || key == KeyEvent.VK_S) {
+				dx = 0;
+				dy = (tile[pos.x()+1][pos.y()] != 1) ? (int)(1 * Level.TILESIZE / frames) : 0;
+			}
+			
+			else if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
+				dx = (tile[pos.x()][pos.y()-1] != 1) ? (int)(-1 * Level.TILESIZE / frames) : 0;
+				dy = 0;
+			}
+			
+			moving = true;
+			moveCount = 0;
+		}
 	}
 	
 	public void scared() {

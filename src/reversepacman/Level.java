@@ -46,6 +46,7 @@ public class Level extends JPanel implements ActionListener {
    
    protected final int DELAY = 15;
    protected int pointCount = 0;
+   protected int totalCherry;
    protected int score;
    protected JButton backButton;
 
@@ -93,11 +94,11 @@ public class Level extends JPanel implements ActionListener {
        title = new Sprite(TILESIZE, TILESIZE, "src/resources/title.png");
 
        setPreferredSize(new Dimension(ReversePacman.WIDTH, ReversePacman.HEIGHT));
-
-       pacman = new Pacman(IPACMAN_X, IPACMAN_Y);
-       ghost = new Ghost(IGHOST_X, IGHOST_Y);
-
+       
        initTiles();
+
+       pacman = new Pacman(IPACMAN_X, IPACMAN_Y, totalCherry, pointCount);
+       ghost = new Ghost(IGHOST_X, IGHOST_Y);       
 
        timer = new Timer(DELAY, this);
        timer.start();
@@ -130,11 +131,6 @@ public class Level extends JPanel implements ActionListener {
 	   
 	   g.drawImage(title.getImage(), title.getX(), title.getY(), this);
 	   
-	   for (Tile t : tiles) {
-           if (t.isVisible()) {
-               g.drawImage(t.getImage(), t.getX(), t.getY(), this);
-           }
-       }
 
        if (ghost.isVisible()) {
            g.drawImage(ghost.getImage(), ghost.getX(), ghost.getY(),
@@ -145,13 +141,29 @@ public class Level extends JPanel implements ActionListener {
            g.drawImage(pacman.getImage(), pacman.getX(), pacman.getY(),
                    this);
        }   
+       
+       for (Tile t : tiles) {
+           if (t.isVisible()) {
+               g.drawImage(t.getImage(), t.getX(), t.getY(), this);
+           }
+//           Position pos = t.getPosition();
+//           Font font = new Font("Serif", Font.PLAIN, 6);
+//           g.setColor(Color.WHITE);
+//           g.setFont(font);
+//           String str = String.format("%d|%d", pos.x(), pos.y());
+//           g.drawString(str, t.getX(), t.getY()+5);
+       }
    }
 
    private void drawGameOver(Graphics g) {   	
-	   if (pacman.isChasing()) {
-		   setBackground(new Color(65, 10, 10));
+	   if (pacman.isChasing() || pointCount <= 0) {
+		   setBackground(new Color(50, 24, 24));
+		   
+		   if(pointCount <= 0) ghost.setVisible(true);
 	   } else {
-		   setBackground(new Color(9, 55, 13));
+		   ghost.setVisible(true);
+		   pacman.setVisible(false);
+		   setBackground(new Color(24, 50, 36));
 	   }
 	   drawObjects(g);
    }
@@ -178,6 +190,8 @@ public class Level extends JPanel implements ActionListener {
 
    private void updatePacman() {
        if (pacman.isVisible()) {
+    	   pacman.updateCherryTime(pointCount);
+    	   pacman.chooseNextMove(tile, ghost);
     	   pacman.move();    
     	   
     	   if (!pacman.updateChase()) {
@@ -196,29 +210,17 @@ public class Level extends JPanel implements ActionListener {
 	   
 	   if (tile[x][y] == 1) {
 		   	   
-		   int boundX = TILES_Y - 1;
-		   int boundY = TILES_X - 1;
-		   boolean xL = (x-1 >= 0) ? true : false;
-		   boolean xR = (x+1 <= boundX) ? true : false;
-		   boolean yL = (y-1 >= 0) ? true : false;
-		   boolean yR = (y+1 <= boundY) ? true : false;
+		   int[] adjTile = Tile.getAdjacentTiles(x, y, tile);
 		   
-		   int up = (xL) ? tile[x-1][y] : 0;
-		   int right = (yR) ? tile[x][y+1] : 0;
-		   int down = (xR) ? tile[x+1][y] : 0;
-		   int left = (yL) ? tile[x][y-1] : 0;
-		   int topL = (xL && yL) ? tile[x-1][y-1] : 0;
-		   int topR = (xL && yR) ? tile[x-1][y+1] : 0;
-		   int bottomL = (xR && yL) ? tile[x+1][y-1] : 0;
-		   int bottomR = (xR && yR) ? tile[x+1][y+1] : 0;
-		   
-		   return new Wall(posX, posY, up, right, down, left, topL, topR, bottomL, bottomR);
+		   return new Wall(posX, posY, adjTile[0], adjTile[1], adjTile[2], adjTile[3], 
+				   adjTile[4], adjTile[5], adjTile[6], adjTile[7]);
 		   
 	   } else if (tile[x][y] == 0) {
 		   pointCount++;
 		   return new Point(posX, posY);
 		   
 	   } else if (tile[x][y] == 2) {
+		   totalCherry++;
 		   return new Cherry(posX, posY);
 		   
 	   } else {
@@ -240,18 +242,16 @@ public class Level extends JPanel implements ActionListener {
     	   
            if (collStat == 1) {
         	   pointCount--;
-        	   int idxY = (t.getX() - TILEBASE_Y) / TILESIZE;
-        	   int idxX = (t.getY() - TILEBASE_X) / TILESIZE;
+        	   Position pos = t.getPosition();
         	   
-        	   tile[idxX][idxY] = -1;
+        	   tile[pos.x()][pos.y()] = -1;
         	   
            } else if (collStat == 2) {
         	   ghost.scared();
         	   pacman.setChasing();
-        	   int idxY = (t.getX() - TILEBASE_Y) / TILESIZE;
-        	   int idxX = (t.getY() - TILEBASE_X) / TILESIZE;
+        	   Position pos = t.getPosition();
         	   
-        	   tile[idxX][idxY] = -1;
+        	   tile[pos.x()][pos.y()] = -1;
            }
        
            if (pointCount <= 0) {
@@ -265,7 +265,7 @@ public class Level extends JPanel implements ActionListener {
 
 	   @Override
        public void keyPressed(KeyEvent e) {
-           pacman.keyPressed(e, tile);
+           ghost.keyPressed(e, tile);
        }
    }
 }
