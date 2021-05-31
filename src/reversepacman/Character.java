@@ -11,7 +11,7 @@ public abstract class Character extends Tile {
         this.moving = false;
         this.dx = 0;
         this.dy = 0;
-        this.frames = 4;
+        this.frames = 8;
         this.moveCount = 0;
 
         initTile();

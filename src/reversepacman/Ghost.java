@@ -6,6 +6,7 @@ public class Ghost extends Character {
 	
 	public Ghost(int x, int y) {
 		super(x, y);
+		this.frames = 4;
 	}
 
 	@Override
