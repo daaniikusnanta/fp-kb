@@ -1,6 +1,8 @@
 package reversepacman;
 
 public abstract class Character extends Tile {
+	
+	enum Move {Up, Right, Down, Left}	
     protected boolean moving;
     protected int dx, dy;
     protected int moveCount;
@@ -11,7 +13,7 @@ public abstract class Character extends Tile {
         this.moving = false;
         this.dx = 0;
         this.dy = 0;
-        this.frames = 8;
+        this.frames = 16;
         this.moveCount = 0;
 
         initTile();

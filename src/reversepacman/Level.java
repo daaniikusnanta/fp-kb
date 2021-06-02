@@ -39,8 +39,8 @@ public class Level extends JPanel implements ActionListener {
    protected final static int TILES_Y = 27;
    protected Ghost ghost;
    protected Pacman pacman;
-   protected final int IGHOST_X = TILEBASE_X + 12 * TILESIZE;
-   protected final int IGHOST_Y = TILEBASE_Y + 12 * TILESIZE;
+   protected final int IGHOST_X = TILEBASE_Y + 9 * TILESIZE;
+   protected final int IGHOST_Y = TILEBASE_X + 25 * TILESIZE;
    protected final int IPACMAN_X = TILEBASE_X + 16 * TILESIZE;
    protected final int IPACMAN_Y = TILEBASE_Y + 21 * TILESIZE;
    
@@ -53,7 +53,7 @@ public class Level extends JPanel implements ActionListener {
    private int[][] tile = {
 	  // 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21  
    		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //1
-   		{1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //2
+   		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //2
    		{1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1}, //3
    		{1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1}, //4
    		{1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1}, //5
@@ -77,7 +77,7 @@ public class Level extends JPanel implements ActionListener {
    		{1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1}, //23
    		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1}, //24
    		{1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1}, //25
-   		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //26
+   		{1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //26
    		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};//27
    
    public Level() {
@@ -146,12 +146,6 @@ public class Level extends JPanel implements ActionListener {
            if (t.isVisible()) {
                g.drawImage(t.getImage(), t.getX(), t.getY(), this);
            }
-//           Position pos = t.getPosition();
-//           Font font = new Font("Serif", Font.PLAIN, 6);
-//           g.setColor(Color.WHITE);
-//           g.setFont(font);
-//           String str = String.format("%d|%d", pos.x(), pos.y());
-//           g.drawString(str, t.getX(), t.getY()+5);
        }
    }
 
@@ -227,7 +221,6 @@ public class Level extends JPanel implements ActionListener {
 		   return null;
 	   }
    }
-
 
    public void checkCollisions() {
 	   

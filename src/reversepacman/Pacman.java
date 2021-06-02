@@ -4,12 +4,15 @@ import java.awt.Rectangle;
 import java.awt.event.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 public class Pacman extends Character {
 	
-	enum Move {Up, Right, Down, Left}	
 	protected boolean chasing;
 	protected boolean findingCherry;
 	protected int chaseTime;
@@ -42,32 +45,36 @@ public class Pacman extends Character {
 			Move nextMove;
 			
 			if (chasing) nextMove = searchGhost(tile, ghost);
-			else if (findingCherry) nextMove = searchCherry(tile);
+			else if (findingCherry) nextMove = searchCherry(tile, ghost);
 			else nextMove = searchPoint(tile, ghost);
-			
+		
 			Position pos = getPosition();
 			
-			if(nextMove == null) System.out.print("null woy");
+			if(nextMove == null) System.out.print("null woy\n");
 		
 			switch (nextMove) {
 				case Up:
 					dx = 0;
 					dy = (tile[pos.x()-1][pos.y()] != 1) ? (int)(-1 * Level.TILESIZE / frames) : 0;
+					System.out.print("Up\n");
 					break;
 			
 				case Right:
 					dx = (tile[pos.x()][pos.y()+1] != 1) ? (int)(1 * Level.TILESIZE / frames) : 0;
 					dy = 0;
+					System.out.print("Right\n");
 					break;
 				
 				case Down:
 					dx = 0;
 					dy = (tile[pos.x()+1][pos.y()] != 1) ? (int)(1 * Level.TILESIZE / frames) : 0;
+					System.out.print("Down\n");
 					break;
 				
 				case Left:
 					dx = (tile[pos.x()][pos.y()-1] != 1) ? (int)(-1 * Level.TILESIZE / frames) : 0;
 					dy = 0;
+					System.out.print("Left\n");
 					break;
 			
 				default:
@@ -78,18 +85,91 @@ public class Pacman extends Character {
 		}
 	}
 	
-	private Move searchGhost(int[][] tile, Ghost ghost) {
-		return null;
-		//TODO:
-		//	Implementasi A* buat nyari ghost
-		//  Return Move berdasarkan jalur yang menuju ghost
+	private Move searchGhost(int[][] tile, Ghost ghost) {		
+		Position pos = this.getPosition();
+		Position ghostPos = ghost.getPosition();
+
+		System.out.printf("start: %d %d\n", pos.x(), pos.y());
+
+		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
+		Tree searchTree = new Tree(node);
+		Comparator<TreeNode> nodeFComparator = new Comparator<TreeNode>() {
+            @Override
+            public int compare(TreeNode a, TreeNode b) {
+            	return Integer.compare(a.f, b.f);
+            }
+        };
+		PriorityQueue<TreeNode> fringe = new PriorityQueue<TreeNode>(nodeFComparator);
+		HashMap<Position, Integer> visited = new HashMap<Position, Integer>();
+		fringe.add(node);
+
+		while (!fringe.isEmpty()) {
+			node = fringe.poll();
+			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
+			visited.put(node.data, node.cost);
+
+			if (node.data.equals(ghostPos)) {
+				return getMove(getNextMoveNode(node, searchTree));
+			}
+
+			ArrayList<Position> children = getAvailableMoves(node.data, node.parent, tile);
+			Iterator<Position> i = children.iterator();
+
+			while (i.hasNext()) {
+				Position childPos = i.next();
+				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
+				
+
+				if (!visited.containsKey(childPos) || node.cost + 1 < visited.get(childPos)) {
+					TreeNode child = new TreeNode(childPos, node.cost + 1,
+							getHeuristic(childPos, ghostPos));
+					fringe.add(child);
+					searchTree.insert(child, node);
+				}
+			}
+			System.out.printf("fringe size: %d\n", fringe.size());
+		}
+		return getMove(getNextMoveNode(node, searchTree));
 	}
 	
-	private Move searchCherry(int[][] tile) {
-		return null;
-		//TODO:
-		//	Implementasi A* buat nyari cherry
-		//  Return Move berdasarkan jalur yang menuju cherry
+	private Move searchCherry(int[][] tile, Ghost ghost) {
+		Position pos = this.getPosition();
+		Position ghostPos = ghost.getPosition();
+		System.out.printf("\nstart: %d %d\n", pos.x(), pos.y());
+		
+		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
+		Tree searchTree = new Tree(node);
+		Deque<TreeNode> fringe = new ArrayDeque<TreeNode>();
+		ArrayList<Position> visited = new ArrayList<Position>();
+		fringe.add(node);
+		
+		while (!fringe.isEmpty()) {
+			node = fringe.pop();
+			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
+			
+			if (tile[node.data.x()][node.data.y()] == 2) {
+				return getMove(getNextMoveNode(node, searchTree));
+			}
+			
+			ArrayList<Position> children = getAvailableMoves(node.data, node.parent, tile);
+			Iterator<Position> i = children.iterator();
+			
+			while (i.hasNext()) {
+				Position childPos = i.next();
+				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
+				TreeNode child = new TreeNode(childPos, node.cost + 1, 
+						getHeuristic(childPos, ghostPos));
+				
+				if (!visited.contains(childPos) && 
+						(child.heuristic >= 2 || child.heuristic >= node.heuristic)) {
+					visited.add(child.data);
+					fringe.addLast(child);
+					searchTree.insert(child, node);
+				}					
+			}
+			System.out.printf("fringe size: %d\n", fringe.size());
+		}
+		return searchPoint(tile, ghost);
 	}
 
 	private Move searchPoint(int[][] tile, Ghost ghost) {	
@@ -97,7 +177,7 @@ public class Pacman extends Character {
 		Position ghostPos = ghost.getPosition();
 		boolean adjEmpty = isAdjEmpty(pos, ghostPos, tile);
 		
-		System.out.printf("start: %d %d\n", pos.x(), pos.y());
+		System.out.printf("\nstart: %d %d\n", pos.x(), pos.y());
 		
 		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
 		Tree searchTree = new Tree(node);
@@ -127,7 +207,7 @@ public class Pacman extends Character {
 					continue;
 				}
 				
-				if (child.heuristic >= 2) {
+				if (child.heuristic >= 2 || child.heuristic >= node.heuristic) {
 					fringe.addLast(child);
 					searchTree.insert(child, node);
 				}					
@@ -173,7 +253,7 @@ public class Pacman extends Character {
 		
 		TreeNode parent = node.parent;
 		
-		while(parent != null && !parent.data.isEqual(this.getPosition())) {
+		while(parent != null && !parent.data.equals(this.getPosition())) {
 			System.out.printf("parent: %d %d\n", parent.data.x(), parent.data.y());
 			node = parent;
 			parent = node.parent;

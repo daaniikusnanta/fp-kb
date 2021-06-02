@@ -6,7 +6,7 @@ public class Ghost extends Character {
 	
 	public Ghost(int x, int y){
 		super(x, y);
-		this.frames = 4;
+		this.frames = 8;
 	}
 
 	@Override
@@ -49,12 +49,12 @@ public class Ghost extends Character {
 	public void scared() {
 		loadImage("src/resources/ghost_scared.png");
         getImageDimensions();
-        frames = 8;
+        frames = 16;
 	}
 	
 	public void normal() {
 		loadImage("src/resources/ghost.png");
         getImageDimensions();
-        frames = 4;
+        frames = 8;
 	}
 }

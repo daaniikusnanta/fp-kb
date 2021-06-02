@@ -29,9 +29,10 @@ public class Position {
 		this.y = y;
 	}
 	
-	public boolean isEqual (Position b) {
+	@Override
+	public boolean equals(Object obj) {
+		Position b = (Position) obj;
 		if (this.x() == b.x() && this.y() == b.y()) return true;
 		return false;
 	}
-	
 }
