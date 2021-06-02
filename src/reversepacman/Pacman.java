@@ -19,7 +19,7 @@ public class Pacman extends Character {
 	protected int cherryInterval;
 	protected int cherryFindCount;
 	protected int cherryFindCountMax;
-	
+	protected final int maxDistToGhost = 4;
 
 	public Pacman(int x, int y, int totalCherry, int pointCount) {
 		super(x, y);		
@@ -161,7 +161,7 @@ public class Pacman extends Character {
 						getHeuristic(childPos, ghostPos));
 				
 				if (!visited.contains(childPos) && 
-						(child.heuristic >= 2 || child.heuristic >= node.heuristic)) {
+						(child.heuristic >= maxDistToGhost || child.heuristic >= node.heuristic)) {
 					visited.add(child.data);
 					fringe.addLast(child);
 					searchTree.insert(child, node);
@@ -207,7 +207,7 @@ public class Pacman extends Character {
 					continue;
 				}
 				
-				if (child.heuristic >= 2 || child.heuristic >= node.heuristic) {
+				if (child.heuristic >= maxDistToGhost || child.heuristic >= node.heuristic) {
 					fringe.addLast(child);
 					searchTree.insert(child, node);
 				}					
