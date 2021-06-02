@@ -14,6 +14,9 @@ public class Wall extends Tile {
 		this.imageName = "src/resources/wall_" + 
 				this.up.toString() + this.right.toString() + 
 				this.down.toString() + this.left.toString() + ".png";
+		if (up + right + down + left + topL + topR + bottomL + bottomR == 8) {
+			this.imageName = "src/resources/wall_empty.png";
+		}
 		
 		initTile();
 	}

@@ -48,7 +48,7 @@ public class Pacman extends Character {
 			else nextMove = getMove(searchPoint(tile, ghost));
 			
 			if(nextMove == null) {
-				System.out.print("null woy\n");
+//				System.out.print("null woy\n");
 				nextMove = Move.Stay;
 			}
 		
@@ -56,31 +56,31 @@ public class Pacman extends Character {
 				case Up:
 					dx = 0;
 					dy = (tile[pos.x()-1][pos.y()] != 1) ? (int)(-1 * Level.TILESIZE / frames) : 0;
-					System.out.print("Up\n");
+//					System.out.print("Up\n");
 					break;
 			
 				case Right:
 					dx = (tile[pos.x()][pos.y()+1] != 1) ? (int)(1 * Level.TILESIZE / frames) : 0;
 					dy = 0;
-					System.out.print("Right\n");
+//					System.out.print("Right\n");
 					break;
 				
 				case Down:
 					dx = 0;
 					dy = (tile[pos.x()+1][pos.y()] != 1) ? (int)(1 * Level.TILESIZE / frames) : 0;
-					System.out.print("Down\n");
+//					System.out.print("Down\n");
 					break;
 				
 				case Left:
 					dx = (tile[pos.x()][pos.y()-1] != 1) ? (int)(-1 * Level.TILESIZE / frames) : 0;
 					dy = 0;
-					System.out.print("Left\n");
+//					System.out.print("Left\n");
 					break;
 					
 				case Stay:
 					dx = 0;
 					dy = 0;
-					System.out.print("Stay\n");
+//					System.out.print("Stay\n");
 					break;
 					
 				default:
@@ -94,7 +94,7 @@ public class Pacman extends Character {
 	private TreeNode searchGhost(Position pos, int[][] tile, Ghost ghost) {
 		Position ghostPos = ghost.getPosition();
 
-		System.out.printf("start: %d %d\n", pos.x(), pos.y());
+//		System.out.printf("start: %d %d\n", pos.x(), pos.y());
 
 		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
 		Tree searchTree = new Tree(node);
@@ -110,7 +110,7 @@ public class Pacman extends Character {
 
 		while (!fringe.isEmpty()) {
 			node = fringe.poll();
-			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
+//			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
 			visited.put(node.data, node.cost);
 
 			if (node.data.equals(ghostPos)) {
@@ -122,7 +122,7 @@ public class Pacman extends Character {
 
 			while (i.hasNext()) {
 				Position childPos = i.next();
-				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
+//				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
 				
 
 				if (!visited.containsKey(childPos) || node.cost + 1 < visited.get(childPos)) {
@@ -132,7 +132,7 @@ public class Pacman extends Character {
 					searchTree.insert(child, node);
 				}
 			}
-			System.out.printf("fringe size: %d\n", fringe.size());
+//			System.out.printf("fringe size: %d\n", fringe.size());
 		}
 		return node;
 	}
@@ -140,7 +140,7 @@ public class Pacman extends Character {
 	private TreeNode searchCherry(int[][] tile, Ghost ghost) {
 		Position pos = this.getPosition();
 		Position ghostPos = ghost.getPosition();
-		System.out.printf("\nstart: %d %d\n", pos.x(), pos.y());
+//		System.out.printf("\nstart: %d %d\n", pos.x(), pos.y());
 		
 		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
 		Tree searchTree = new Tree(node);
@@ -150,7 +150,7 @@ public class Pacman extends Character {
 		
 		while (!fringe.isEmpty()) {
 			node = fringe.pop();
-			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
+//			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
 			
 			if (tile[node.data.x()][node.data.y()] == 2) {
 				return node;
@@ -161,7 +161,7 @@ public class Pacman extends Character {
 			
 			while (i.hasNext()) {
 				Position childPos = i.next();
-				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
+//				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
 				TreeNode child = new TreeNode(childPos, node.cost + 1, 
 						getHeuristic(childPos, ghostPos));
 				
@@ -172,7 +172,7 @@ public class Pacman extends Character {
 					searchTree.insert(child, node);
 				}					
 			}
-			System.out.printf("fringe size: %d\n", fringe.size());
+//			System.out.printf("fringe size: %d\n", fringe.size());
 		}
 		return searchPoint(tile, ghost);
 	}
@@ -182,7 +182,7 @@ public class Pacman extends Character {
 		Position ghostPos = ghost.getPosition();
 		boolean adjEmpty = isAdjEmpty(pos, ghostPos, tile);
 		
-		System.out.printf("\nstart: %d %d\n", pos.x(), pos.y());
+//		System.out.printf("\nstart: %d %d\n", pos.x(), pos.y());
 		
 		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
 		Tree searchTree = new Tree(node);
@@ -191,7 +191,7 @@ public class Pacman extends Character {
 		
 		while (!fringe.isEmpty()) {
 			node = fringe.pop();
-			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
+//			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
 			
 			if ((adjEmpty && tile[node.data.x()][node.data.y()] == 0) || 
 					(!adjEmpty && node.cost == 15)) {
@@ -203,7 +203,7 @@ public class Pacman extends Character {
 			
 			while (i.hasNext()) {
 				Position childPos = i.next();
-				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
+//				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
 				TreeNode child = new TreeNode(childPos, node.cost + 1, 
  						getHeuristic(childPos, ghostPos));
 				
@@ -219,7 +219,7 @@ public class Pacman extends Character {
 					searchTree.insert(child, node);
 				}					
 			}
-			System.out.printf("fringe size: %d\n", fringe.size());
+//			System.out.printf("fringe size: %d\n", fringe.size());
 		}
 		return node;
 	}
@@ -263,7 +263,7 @@ public class Pacman extends Character {
 		TreeNode parent = node.parent;
 		
 		while(parent != null && !parent.data.equals(this.getPosition())) {
-			System.out.printf("parent: %d %d\n", parent.data.x(), parent.data.y());
+//			System.out.printf("parent: %d %d\n", parent.data.x(), parent.data.y());
 			node = parent;
 			parent = node.parent;
 		}
