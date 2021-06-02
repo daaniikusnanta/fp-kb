@@ -78,7 +78,7 @@ public class Level extends JPanel implements ActionListener {
    protected void initLevel() {
 	   addKeyListener(new TAdapter());
        setFocusable(true);
-       setBackground(Color.BLACK);
+       setBackground(new Color(30, 30, 30));
        playerName = "";
        ingame = true;
        score = 0;
