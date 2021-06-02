@@ -1,23 +1,37 @@
 package reversepacman;
 
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 
+import javax.swing.ImageIcon;
+
 public class Ghost extends Character {
+	
+	protected Image imageScared;
+	protected Image imageNormal;
+	protected int buffFrames;
 	
 	public Ghost(int x, int y){
 		super(x, y);
 		this.frames = 8;
+		this.buffFrames = 8;
 	}
 
 	@Override
 	protected void initCharacter() {
-		loadImage("src/resources/ghost.png");
+		ImageIcon ii = new ImageIcon("src/resources/ghost.png");
+        this.imageNormal = ii.getImage();
+        ii = new ImageIcon("src/resources/ghost_scared.png");
+        this.imageScared = ii.getImage();
+        
+		this.image = imageNormal;
         getImageDimensions();		
 	}
 	
 	public void keyPressed(KeyEvent e, int[][] tile) {
 		
 		if(!moving) {
+			frames = buffFrames;
 			Position pos = getPosition();
 			int key = e.getKeyCode();
 			
@@ -47,14 +61,12 @@ public class Ghost extends Character {
 	}
 	
 	public void scared() {
-		loadImage("src/resources/ghost_scared.png");
-        getImageDimensions();
-        frames = 16;
+		this.image = imageScared;
+        buffFrames = 16;
 	}
 	
 	public void normal() {
-		loadImage("src/resources/ghost.png");
-        getImageDimensions();
-        frames = 8;
+		this.image = imageNormal;
+        buffFrames = 8;
 	}
 }

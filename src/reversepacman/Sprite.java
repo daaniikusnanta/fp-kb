@@ -35,7 +35,7 @@ public class Sprite {
         ImageIcon ii = new ImageIcon(imageName);
         image = ii.getImage();
     }
-
+    
     public Image getImage() {
         return image;
     }

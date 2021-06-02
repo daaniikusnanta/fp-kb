@@ -2,7 +2,7 @@ package reversepacman;
 
 public abstract class Character extends Tile {
 	
-	enum Move {Up, Right, Down, Left}	
+	enum Move {Up, Right, Down, Left, Stay}	
     protected boolean moving;
     protected int dx, dy;
     protected int moveCount;

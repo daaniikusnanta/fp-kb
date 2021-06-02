@@ -1,14 +1,12 @@
 package reversepacman;
 
 import java.awt.Rectangle;
-import java.awt.event.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Pacman extends Character {
@@ -19,7 +17,7 @@ public class Pacman extends Character {
 	protected int cherryInterval;
 	protected int cherryFindCount;
 	protected int cherryFindCountMax;
-	protected final int maxDistToGhost = 4;
+	protected final int maxDistToGhost = 2;
 
 	public Pacman(int x, int y, int totalCherry, int pointCount) {
 		super(x, y);		
@@ -43,14 +41,16 @@ public class Pacman extends Character {
 		if(!moving) {
 		
 			Move nextMove;
+			Position pos = this.getPosition();
 			
-			if (chasing) nextMove = searchGhost(tile, ghost);
-			else if (findingCherry) nextMove = searchCherry(tile, ghost);
-			else nextMove = searchPoint(tile, ghost);
-		
-			Position pos = getPosition();
+			if (chasing) nextMove = getMove(searchGhost(pos, tile, ghost));
+			else if (findingCherry) nextMove = getMove(searchCherry(tile, ghost));
+			else nextMove = getMove(searchPoint(tile, ghost));
 			
-			if(nextMove == null) System.out.print("null woy\n");
+			if(nextMove == null) {
+				System.out.print("null woy\n");
+				nextMove = Move.Stay;
+			}
 		
 			switch (nextMove) {
 				case Up:
@@ -76,7 +76,13 @@ public class Pacman extends Character {
 					dy = 0;
 					System.out.print("Left\n");
 					break;
-			
+					
+				case Stay:
+					dx = 0;
+					dy = 0;
+					System.out.print("Stay\n");
+					break;
+					
 				default:
 					break;
 			}
@@ -85,8 +91,7 @@ public class Pacman extends Character {
 		}
 	}
 	
-	private Move searchGhost(int[][] tile, Ghost ghost) {		
-		Position pos = this.getPosition();
+	private TreeNode searchGhost(Position pos, int[][] tile, Ghost ghost) {
 		Position ghostPos = ghost.getPosition();
 
 		System.out.printf("start: %d %d\n", pos.x(), pos.y());
@@ -109,7 +114,7 @@ public class Pacman extends Character {
 			visited.put(node.data, node.cost);
 
 			if (node.data.equals(ghostPos)) {
-				return getMove(getNextMoveNode(node, searchTree));
+				return node;
 			}
 
 			ArrayList<Position> children = getAvailableMoves(node.data, node.parent, tile);
@@ -129,10 +134,10 @@ public class Pacman extends Character {
 			}
 			System.out.printf("fringe size: %d\n", fringe.size());
 		}
-		return getMove(getNextMoveNode(node, searchTree));
+		return node;
 	}
 	
-	private Move searchCherry(int[][] tile, Ghost ghost) {
+	private TreeNode searchCherry(int[][] tile, Ghost ghost) {
 		Position pos = this.getPosition();
 		Position ghostPos = ghost.getPosition();
 		System.out.printf("\nstart: %d %d\n", pos.x(), pos.y());
@@ -148,7 +153,7 @@ public class Pacman extends Character {
 			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
 			
 			if (tile[node.data.x()][node.data.y()] == 2) {
-				return getMove(getNextMoveNode(node, searchTree));
+				return node;
 			}
 			
 			ArrayList<Position> children = getAvailableMoves(node.data, node.parent, tile);
@@ -161,7 +166,7 @@ public class Pacman extends Character {
 						getHeuristic(childPos, ghostPos));
 				
 				if (!visited.contains(childPos) && 
-						(child.heuristic >= maxDistToGhost || child.heuristic >= node.heuristic)) {
+						(child.heuristic > maxDistToGhost || child.heuristic >= node.heuristic)) {
 					visited.add(child.data);
 					fringe.addLast(child);
 					searchTree.insert(child, node);
@@ -172,7 +177,7 @@ public class Pacman extends Character {
 		return searchPoint(tile, ghost);
 	}
 
-	private Move searchPoint(int[][] tile, Ghost ghost) {	
+	private TreeNode searchPoint(int[][] tile, Ghost ghost) {	
 		Position pos = this.getPosition();
 		Position ghostPos = ghost.getPosition();
 		boolean adjEmpty = isAdjEmpty(pos, ghostPos, tile);
@@ -190,7 +195,7 @@ public class Pacman extends Character {
 			
 			if ((adjEmpty && tile[node.data.x()][node.data.y()] == 0) || 
 					(!adjEmpty && node.cost == 15)) {
-				return getMove(getNextMoveNode(node, searchTree));
+				return node;
 			}
 			
 			ArrayList<Position> children = getAvailableMoves(node.data, node.parent, tile);
@@ -200,45 +205,49 @@ public class Pacman extends Character {
 				Position childPos = i.next();
 				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
 				TreeNode child = new TreeNode(childPos, node.cost + 1, 
-						getHeuristic(childPos, ghostPos));
+ 						getHeuristic(childPos, ghostPos));
 				
-				if (!adjEmpty && (tile[childPos.x()][childPos.y()] == 1 ||
-						tile[childPos.x()][childPos.y()] == -1)) {
+				if (!adjEmpty && children.size() > 1 &&
+						(tile[childPos.x()][childPos.y()] == -1 ||
+						tile[childPos.x()][childPos.y()] == 2)) {
 					continue;
 				}
 				
-				if (child.heuristic >= maxDistToGhost || child.heuristic >= node.heuristic) {
+				if (child.heuristic > maxDistToGhost || 
+						child.heuristic >= node.heuristic) {
 					fringe.addLast(child);
 					searchTree.insert(child, node);
 				}					
 			}
 			System.out.printf("fringe size: %d\n", fringe.size());
 		}
-		return getMove(getNextMoveNode(node, searchTree));
+		return node;
 	}
 	
 	private boolean isAdjEmpty(Position pos, Position ghostPos, int tile[][]) {
 		int adj[] = getAdjacentTiles(pos.x(), pos.y(), tile);
 		
 		boolean up = (adj[0] != 0 || 
-				getHeuristic(new Position(pos.x()-1, pos.y()), ghostPos) <= 2) ? true : false;
+				getHeuristic(new Position(pos.x()-1, pos.y()), ghostPos) <= maxDistToGhost) ? true : false;
 		
 		boolean right = (adj[1] != 0 || 
-				getHeuristic(new Position(pos.x(), pos.y()+1), ghostPos) <= 2) ? true : false;
+				getHeuristic(new Position(pos.x(), pos.y()+1), ghostPos) <= maxDistToGhost) ? true : false;
 		
 		boolean down = (adj[2] != 0 || 
-				getHeuristic(new Position(pos.x()+1, pos.y()), ghostPos) <= 2) ? true : false;
+				getHeuristic(new Position(pos.x()+1, pos.y()), ghostPos) <= maxDistToGhost) ? true : false;
 		
 		boolean left = (adj[3] != 0 || 
-				getHeuristic(new Position(pos.x(), pos.y()-1), ghostPos) <= 2) ? true : false;
+				getHeuristic(new Position(pos.x(), pos.y()-1), ghostPos) <= maxDistToGhost) ? true : false;
 		
 		if (up && right && down && left) return true;
 		return false;
 	}
 	
 	private Move getMove(TreeNode node) {
-		int nodeX = node.data.x();
-		int nodeY = node.data.y();
+		TreeNode nextMoveNode = getNextMoveNode(node);
+		
+		int nodeX = nextMoveNode.data.x();
+		int nodeY = nextMoveNode.data.y();
 		int x = this.getPosition().x();
 		int y = this.getPosition().y();
 		
@@ -249,7 +258,7 @@ public class Pacman extends Character {
 		return null;
 	}
 	
-	private TreeNode getNextMoveNode(TreeNode node, Tree tree) {
+	private TreeNode getNextMoveNode(TreeNode node) {
 		
 		TreeNode parent = node.parent;
 		

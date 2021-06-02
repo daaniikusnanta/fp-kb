@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class ReversePacman extends JFrame {
 
 	public static final int WIDTH = Level.TILESIZE*23;

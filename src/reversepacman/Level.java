@@ -2,29 +2,20 @@ package reversepacman;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+@SuppressWarnings("serial")
 public class Level extends JPanel implements ActionListener {
    protected Timer timer;
    protected Sprite title;
@@ -39,8 +30,8 @@ public class Level extends JPanel implements ActionListener {
    protected final static int TILES_Y = 27;
    protected Ghost ghost;
    protected Pacman pacman;
-   protected final int IGHOST_X = TILEBASE_Y + 9 * TILESIZE;
-   protected final int IGHOST_Y = TILEBASE_X + 25 * TILESIZE;
+   protected final int IGHOST_X = TILEBASE_Y + 10 * TILESIZE;
+   protected final int IGHOST_Y = TILEBASE_X + 12 * TILESIZE;
    protected final int IPACMAN_X = TILEBASE_X + 16 * TILESIZE;
    protected final int IPACMAN_Y = TILEBASE_Y + 21 * TILESIZE;
    
@@ -55,7 +46,7 @@ public class Level extends JPanel implements ActionListener {
    		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //1
    		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //2
    		{1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1}, //3
-   		{1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1}, //4
+   		{1, 2, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 2, 1}, //4
    		{1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1}, //5
    		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //6
    		{1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1}, //7
@@ -75,9 +66,9 @@ public class Level extends JPanel implements ActionListener {
    		{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1}, //21
    		{1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1}, //22
    		{1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1}, //23
-   		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1}, //24
+   		{1, 0, 0, 0, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0, 0, 0, 1}, //24
    		{1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1}, //25
-   		{1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //26
+   		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //26
    		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};//27
    
    public Level() {
@@ -130,8 +121,13 @@ public class Level extends JPanel implements ActionListener {
    private void drawObjects(Graphics g) {
 	   
 	   g.drawImage(title.getImage(), title.getX(), title.getY(), this);
-	   
 
+       for (Tile t : tiles) {
+           if (t.isVisible()) {
+               g.drawImage(t.getImage(), t.getX(), t.getY(), this);
+           }
+       }
+       
        if (ghost.isVisible()) {
            g.drawImage(ghost.getImage(), ghost.getX(), ghost.getY(),
                    this);
@@ -141,12 +137,6 @@ public class Level extends JPanel implements ActionListener {
            g.drawImage(pacman.getImage(), pacman.getX(), pacman.getY(),
                    this);
        }   
-       
-       for (Tile t : tiles) {
-           if (t.isVisible()) {
-               g.drawImage(t.getImage(), t.getX(), t.getY(), this);
-           }
-       }
    }
 
    private void drawGameOver(Graphics g) {   	
