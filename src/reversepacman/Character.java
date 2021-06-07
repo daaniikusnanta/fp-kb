@@ -1,5 +1,8 @@
 package reversepacman;
 
+/**
+ * Kelas abstarct untuk objek karakter (ghost dan pacman).
+ */
 public abstract class Character extends Tile {
 	
 	enum Move {Up, Right, Down, Left, Stay}	
@@ -23,6 +26,11 @@ public abstract class Character extends Tile {
     	initCharacter();
     }
     
+    /**
+     * Menggerakkan karakter dengan mengubah posisi x dan y.
+     * Mengatur status bergerak dengan increment moveCount.
+     * Jika moveCount = jumlah frame, berhenti bergerak.
+     */
 	public void move() {
 		if (moving) {
 			x += dx;

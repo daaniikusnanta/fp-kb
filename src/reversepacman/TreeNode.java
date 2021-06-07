@@ -2,6 +2,9 @@ package reversepacman;
 
 import java.util.ArrayList;
 
+/**
+ * Node untuk {@link reversepacman.Tree}
+ */
 public class TreeNode {
 	protected Position data;
 	protected int cost;
@@ -10,6 +13,13 @@ public class TreeNode {
 	protected TreeNode parent;
 	protected ArrayList<TreeNode> children;
 	
+	/**
+	 * Konstruktor dengan 3 parameter.
+	 * 
+	 * @param data Data dari node
+	 * @param cost Biaya dari node
+	 * @param heuristic	Heuristic dari node
+	 */
 	public TreeNode(Position data, int cost, int heuristic) {
 		this.data = data;
 		this.cost = cost;
@@ -19,6 +29,11 @@ public class TreeNode {
 		this.children = new ArrayList<TreeNode>();
 	}
 	
+	/**
+	 * Konstruktor dengan 1 parameter.
+	 * 
+	 * @param data	Data dari node
+	 */
 	public TreeNode(Position data) {
 		this.data = data;
 		this.cost = 0;
@@ -27,6 +42,11 @@ public class TreeNode {
 		this.parent = null;
 	}
 	
+	/**
+	 * Menambahkan child.
+	 * 
+	 * @param node Node anak yang ditambahkan.
+	 */
 	public void addChild(TreeNode node) {
 		this.children.add(node);
 		node.parent = this;

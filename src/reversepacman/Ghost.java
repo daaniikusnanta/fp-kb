@@ -2,9 +2,11 @@ package reversepacman;
 
 import java.awt.Image;
 import java.awt.event.KeyEvent;
-
 import javax.swing.ImageIcon;
 
+/**
+ * Objek karakter ghost.
+ */
 public class Ghost extends Character {
 	
 	protected Image imageScared;
@@ -17,6 +19,10 @@ public class Ghost extends Character {
 		this.buffFrames = 8;
 	}
 
+	/**
+	 * Inisialisasi objek.
+	 * Membuat 2 image untuk ghost normal dan scared.
+	 */
 	@Override
 	protected void initCharacter() {
 		ImageIcon ii = new ImageIcon("src/resources/ghost.png");
@@ -28,6 +34,13 @@ public class Ghost extends Character {
         getImageDimensions();		
 	}
 	
+	/**
+	 * Kontrol menggunakan keyboard dengan KeyEvent.
+	 * Mengubah dx dan dy berdasarkan event keyboard.
+	 * 
+	 * @param e KeyEvent yang dideteksi
+	 * @param tile array tile berupa maze permainan
+	 */
 	public void keyPressed(KeyEvent e, int[][] tile) {
 		
 		if(!moving) {
@@ -60,11 +73,19 @@ public class Ghost extends Character {
 		}
 	}
 	
+	/**
+	 * Mengubah status ghost menjadi scared.
+	 * Mengubah buffFrames menjadi 16 (lebih lambat).
+	 */
 	public void scared() {
 		this.image = imageScared;
         buffFrames = 16;
 	}
 	
+	/**
+	 * Mengubah status ghost menjadi normal.
+	 * Mengubah buffFrames menjadi 8 (normal).
+	 */
 	public void normal() {
 		this.image = imageNormal;
         buffFrames = 8;

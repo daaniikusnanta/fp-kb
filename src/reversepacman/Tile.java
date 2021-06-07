@@ -1,5 +1,8 @@
 package reversepacman;
 
+/**
+ * Objek tile (wall, point, cherry).
+ */
 public abstract class Tile extends Sprite {
 
     public Tile(int x, int y) {
@@ -8,6 +11,12 @@ public abstract class Tile extends Sprite {
         initTile();
     }
     
+	/**
+	 * Mendapatkan posisi dari objek berdasarkan grid
+	 * yang diambil dari posisi koordinat menurut pixel.
+	 * 
+	 * @return posisi tile berdasarkan grid.
+	 */
     public Position getPosition() {
 		int x = (getY() - Level.TILEBASE_X) / Level.TILESIZE;
     	int y = (getX() - Level.TILEBASE_Y) / Level.TILESIZE;
@@ -16,6 +25,13 @@ public abstract class Tile extends Sprite {
     	return idx;
     }
     
+	/**
+	 * Mendapatkan array yang berisi tile-tile disekitarnya,
+	 * yaitu: atas, kanan, bawah, kiri, 
+	 * kanan atas, kiri atas, kanan bawah, dan kiri bawah.
+	 * 
+	 * @return array tile-tile disekitarnya.
+	 */
     public static int[] getAdjacentTiles(int x, int y, int[][] tile) {
     	int[] tiles = new int[8];
     	

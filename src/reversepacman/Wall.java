@@ -1,10 +1,28 @@
 package reversepacman;
 
+/**
+ * Objek wall/dinding dari maze pacman.
+ */
 public class Wall extends Tile {
 	
 	protected Integer up, right, down, left;
 	protected String imageName;
 
+	/**
+	 * Inisialisasi dan konstruktor objek wall.
+	 * Menggunakan paramater untuk menentukan asset yang tepat.
+	 * 
+	 * @param x	posisi x
+	 * @param y	posisi y
+	 * @param up tile atas
+	 * @param right	tile kanan
+	 * @param down tile bawah
+	 * @param left tile kiri
+	 * @param topL tile kiri atas
+	 * @param topR tile kanan atas
+	 * @param bottomL tile kiri bawah
+	 * @param bottomR tile kanan bawah
+	 */
 	public Wall(int x, int y, int up, int right, int down, int left, int topL, int topR, int bottomL, int bottomR) {
 		super(x, y);
 		this.up = (up == 1 && (topR != 1 || topL != 1 || (left != 1 || right != 1))) ? 1 : 0;

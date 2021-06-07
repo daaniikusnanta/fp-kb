@@ -1,5 +1,8 @@
 package reversepacman;
 
+/**
+ * Objek tile berupa cherry.
+ */
 public class Cherry extends Tile {
 
 	public Cherry(int x, int y) {

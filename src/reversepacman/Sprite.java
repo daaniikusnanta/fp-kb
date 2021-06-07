@@ -2,9 +2,11 @@ package reversepacman;
 
 import java.awt.Image;
 import java.awt.Rectangle;
-
 import javax.swing.ImageIcon;
 
+/** 
+ * Objek sprite (gambar) untuk game.
+*/
 public class Sprite {
     protected int x, y;
     protected int width, height;
@@ -64,6 +66,11 @@ public class Sprite {
         this.visible = visible;
     }
 
+    /**
+     * Mendapatkan Rectangle yang berupa batas dari sprite.
+     * 
+     * @return Rectangle batas dari tile.
+     */
     public Rectangle getBounds() {
         return new Rectangle(x + width/2, y + height/2, width/2, height/2);
     }

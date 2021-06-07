@@ -2,10 +2,17 @@ package reversepacman;
 
 import java.awt.CardLayout;
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+/**
+ * Project FP ETS KB
+ * Kelas Kecerdasan Buatan E
+ * Main class untuk project ini.
+ * 
+ * @author Daanii Kusnanta
+ * @author Aji Wahyu
+ */
 @SuppressWarnings("serial")
 public class ReversePacman extends JFrame {
 
@@ -15,7 +22,6 @@ public class ReversePacman extends JFrame {
     public static JPanel mainPanel;
 
     public ReversePacman() {
-        
         initUI();
     }
     
@@ -23,9 +29,7 @@ public class ReversePacman extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-//        mainPanel.add(new MainMenu(), "title");
         mainPanel.add(new Level(), "level");
-//        mainPanel.add(new CreditPage(), "credit");
         
         add(mainPanel);
         

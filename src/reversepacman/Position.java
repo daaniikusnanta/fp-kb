@@ -1,5 +1,8 @@
 package reversepacman;
 
+/**
+ * Objek posisi untuk posisi tile berdasarkan grid.
+ */
 public class Position {
 	private int x, y;
 	

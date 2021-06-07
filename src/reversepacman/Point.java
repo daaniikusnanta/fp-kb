@@ -1,5 +1,8 @@
 package reversepacman;
 
+/**
+ * Objek tile berupa point.
+ */
 public class Point extends Tile {
 
 	public Point(int x, int y) {

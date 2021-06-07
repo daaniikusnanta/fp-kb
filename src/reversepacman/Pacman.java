@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
+/**
+ * Objek karakter pacman
+ */
 public class Pacman extends Character {
 	
 	protected boolean chasing;
@@ -36,6 +39,14 @@ public class Pacman extends Character {
         getImageDimensions();	
 	}
 	
+	/**
+	 * Memilih move selanjutnya berdasarkan status pacman.
+	 * Move selanjutnya dipilih berdasarkan method bersangkutan.
+	 * Setelah didapatkan move, ubah dx dan dy.
+	 * 
+	 * @param tile Maze permainan
+	 * @param ghost Objek ghost
+	 */
 	public void chooseNextMove(int[][] tile, Ghost ghost) {
 		
 		if(!moving) {
@@ -48,7 +59,6 @@ public class Pacman extends Character {
 			else nextMove = getMove(searchPoint(tile, ghost));
 			
 			if(nextMove == null) {
-//				System.out.print("null woy\n");
 				nextMove = Move.Stay;
 			}
 		
@@ -56,31 +66,26 @@ public class Pacman extends Character {
 				case Up:
 					dx = 0;
 					dy = (tile[pos.x()-1][pos.y()] != 1) ? (int)(-1 * Level.TILESIZE / frames) : 0;
-//					System.out.print("Up\n");
 					break;
 			
 				case Right:
 					dx = (tile[pos.x()][pos.y()+1] != 1) ? (int)(1 * Level.TILESIZE / frames) : 0;
 					dy = 0;
-//					System.out.print("Right\n");
 					break;
 				
 				case Down:
 					dx = 0;
 					dy = (tile[pos.x()+1][pos.y()] != 1) ? (int)(1 * Level.TILESIZE / frames) : 0;
-//					System.out.print("Down\n");
 					break;
 				
 				case Left:
 					dx = (tile[pos.x()][pos.y()-1] != 1) ? (int)(-1 * Level.TILESIZE / frames) : 0;
 					dy = 0;
-//					System.out.print("Left\n");
 					break;
 					
 				case Stay:
 					dx = 0;
 					dy = 0;
-//					System.out.print("Stay\n");
 					break;
 					
 				default:
@@ -91,10 +96,16 @@ public class Pacman extends Character {
 		}
 	}
 	
+	/**
+	 * Mencari ghost dengan A*.
+	 * 
+	 * @param pos Posisi pacman saat ini
+	 * @param tile Maze permainan
+	 * @param ghost Objek ghost
+	 * @return node saat ghost ditemukan.
+	 */
 	private TreeNode searchGhost(Position pos, int[][] tile, Ghost ghost) {
 		Position ghostPos = ghost.getPosition();
-
-//		System.out.printf("start: %d %d\n", pos.x(), pos.y());
 
 		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
 		Tree searchTree = new Tree(node);
@@ -110,7 +121,6 @@ public class Pacman extends Character {
 
 		while (!fringe.isEmpty()) {
 			node = fringe.poll();
-//			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
 			visited.put(node.data, node.cost);
 
 			if (node.data.equals(ghostPos)) {
@@ -121,9 +131,7 @@ public class Pacman extends Character {
 			Iterator<Position> i = children.iterator();
 
 			while (i.hasNext()) {
-				Position childPos = i.next();
-//				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
-				
+				Position childPos = i.next();				
 
 				if (!visited.containsKey(childPos) || node.cost + 1 < visited.get(childPos)) {
 					TreeNode child = new TreeNode(childPos, node.cost + 1,
@@ -132,15 +140,20 @@ public class Pacman extends Character {
 					searchTree.insert(child, node);
 				}
 			}
-//			System.out.printf("fringe size: %d\n", fringe.size());
 		}
 		return node;
 	}
 	
+	/**
+	 * Mencari cherry dengan BFS.
+	 * 
+	 * @param tile Maze permainan
+	 * @param ghost Objek ghost
+	 * @return node saat cherry ditemukan (tile bernilai 2)
+	 */
 	private TreeNode searchCherry(int[][] tile, Ghost ghost) {
 		Position pos = this.getPosition();
 		Position ghostPos = ghost.getPosition();
-//		System.out.printf("\nstart: %d %d\n", pos.x(), pos.y());
 		
 		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
 		Tree searchTree = new Tree(node);
@@ -150,7 +163,6 @@ public class Pacman extends Character {
 		
 		while (!fringe.isEmpty()) {
 			node = fringe.pop();
-//			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
 			
 			if (tile[node.data.x()][node.data.y()] == 2) {
 				return node;
@@ -161,7 +173,6 @@ public class Pacman extends Character {
 			
 			while (i.hasNext()) {
 				Position childPos = i.next();
-//				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
 				TreeNode child = new TreeNode(childPos, node.cost + 1, 
 						getHeuristic(childPos, ghostPos));
 				
@@ -172,17 +183,24 @@ public class Pacman extends Character {
 					searchTree.insert(child, node);
 				}					
 			}
-//			System.out.printf("fringe size: %d\n", fringe.size());
 		}
 		return searchPoint(tile, ghost);
 	}
 
+	/**
+	 * Mencari point sesuai kondisi:
+	 * - Jika tile sekitarnya kosong, cari point pertama yang ditemukan
+	 * - Jika tile sekitarnya terdapat point, cari jalur dengan point
+	 * berturut-turut terbanyak dengan batas 15.
+	 * S
+	 * @param tile Maze permainan
+	 * @param ghost Objek ghost
+	 * @return node saat pint ditemukan (tile bernilai 1)
+	 */
 	private TreeNode searchPoint(int[][] tile, Ghost ghost) {	
 		Position pos = this.getPosition();
 		Position ghostPos = ghost.getPosition();
 		boolean adjEmpty = isAdjEmpty(pos, ghostPos, tile);
-		
-//		System.out.printf("\nstart: %d %d\n", pos.x(), pos.y());
 		
 		TreeNode node = new TreeNode(pos, 0, getHeuristic(pos, ghostPos));
 		Tree searchTree = new Tree(node);
@@ -191,7 +209,6 @@ public class Pacman extends Character {
 		
 		while (!fringe.isEmpty()) {
 			node = fringe.pop();
-//			System.out.printf("\nnode: %d %d\n", node.data.x(), node.data.y());
 			
 			if ((adjEmpty && tile[node.data.x()][node.data.y()] == 0) || 
 					(!adjEmpty && node.cost == 15)) {
@@ -203,7 +220,6 @@ public class Pacman extends Character {
 			
 			while (i.hasNext()) {
 				Position childPos = i.next();
-//				System.out.printf("child: %d %d\n", childPos.x(), childPos.y());
 				TreeNode child = new TreeNode(childPos, node.cost + 1, 
  						getHeuristic(childPos, ghostPos));
 				
@@ -219,11 +235,18 @@ public class Pacman extends Character {
 					searchTree.insert(child, node);
 				}					
 			}
-//			System.out.printf("fringe size: %d\n", fringe.size());
 		}
 		return node;
 	}
 	
+	/**
+	 * Mengambalikan nilai apakah tile sekitarnya kosong (tidak ada point)
+	 * 
+	 * @param pos Posisi pacman saat ini
+	 * @param ghostPos Posisi ghost
+	 * @param tile Maze permainan
+	 * @return boolean nilai apakah tile sekitarnya kosong.
+	 */
 	private boolean isAdjEmpty(Position pos, Position ghostPos, int tile[][]) {
 		int adj[] = getAdjacentTiles(pos.x(), pos.y(), tile);
 		
@@ -243,6 +266,13 @@ public class Pacman extends Character {
 		return false;
 	}
 	
+	/**
+	 * Mengembalikan move selanjutnya berdasarkan posisi node 
+	 * relatif dengan posisi pacman saat ini.
+	 * 
+	 * @param node Node move selanjutnya
+	 * @return Move selanjutnya.
+	 */
 	private Move getMove(TreeNode node) {
 		TreeNode nextMoveNode = getNextMoveNode(node);
 		
@@ -258,12 +288,18 @@ public class Pacman extends Character {
 		return null;
 	}
 	
+	/**
+	 * Mendapatkan node move selanjutnya dengan 
+	 * mengiterasi parent dari node hasil search.
+	 * 
+	 * @param node Node hasil search
+	 * @return node move selanjutnya.
+	 */
 	private TreeNode getNextMoveNode(TreeNode node) {
 		
 		TreeNode parent = node.parent;
 		
 		while(parent != null && !parent.data.equals(this.getPosition())) {
-//			System.out.printf("parent: %d %d\n", parent.data.x(), parent.data.y());
 			node = parent;
 			parent = node.parent;
 		}
@@ -271,6 +307,14 @@ public class Pacman extends Character {
 		return node;
 	}
 	
+	/**
+	 * Mendapatkan move tersedia dari posisi saat ini.
+	 * 
+	 * @param pos Posisi saat ini
+	 * @param parent Parent dari node saat ini
+	 * @param tile Maze permainan
+	 * @return ArrayList Posisi-posisi move yang tersedia.
+	 */
 	private ArrayList<Position> getAvailableMoves(Position pos, TreeNode parent, int[][] tile) {
 		ArrayList<Position> availableMoves = new ArrayList<Position>();
 		Position par = (parent != null) ? parent.data : new Position(0, 0);
@@ -292,12 +336,28 @@ public class Pacman extends Character {
 		return availableMoves;
 	}
 	
+	/**
+	 * Mendapatkan nilai heuristic berdasarkan manhattan distance.
+	 * 
+	 * @param a Posisi pertama
+	 * @param b Posisi kedua
+	 * @return nilai heuristic dari kedua posisi.
+	 */
 	private int getHeuristic(Position a, Position b) {
 		int diffX = Math.abs(a.x() - b.x());
 		int diffY = Math.abs(a.y() - b.y());
 		return diffX + diffY;
 	}
 	
+	/**
+	 * Mengecek collision pacman dengan semua tile:
+	 * - Kembalikan 1 jika collision dengan point
+	 * - Kembalikan 2 jika collision dengan cherry
+	 * - Kembalikan -1 jika tidak collision dengan apapun.
+	 * 
+	 * @param tile
+	 * @return nilai berdasarkan status collision.
+	 */
 	public int checkTileCollision(Tile tile) {
 		Rectangle t = tile.getBounds();
 		Rectangle p = this.getBounds();
@@ -315,6 +375,13 @@ public class Pacman extends Character {
 		return -1;
 	}
 	
+	/**
+	 * Mengecek collision dengan ghost.
+	 * Jika collision buat ghost tidak visible.
+	 * 
+	 * @param ghost Objek ghost
+	 * @return boolean status collision.
+	 */
 	public boolean checkGhostCollision(Ghost ghost) {
 		Rectangle g = ghost.getBounds();
 		Rectangle p = this.getBounds();
@@ -331,6 +398,12 @@ public class Pacman extends Character {
 		return chasing;
 	}
 	
+	/**
+	 * Update cherryTime yang merupakan counter untuk mencari cherry
+	 * berdasarkan sisa point.
+	 * 
+	 * @param pointCount Jumlah poin tersisa
+	 */
 	public void updateCherryTime(int pointCount) {
 		if (cherryFindCount <= cherryFindCountMax && 
 				pointCount == cherryFindCount * cherryInterval) {
@@ -339,6 +412,11 @@ public class Pacman extends Character {
 		}
 	}
 	
+	/**
+	 * Update status mengejar ghost dan waktu saat mengejar.
+	 * 
+	 * @return status mengejar ghost.
+	 */
 	public boolean updateChase() {
 		if(chasing) {
 			chaseTime++;
